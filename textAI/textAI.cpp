@@ -17,9 +17,14 @@ std::string read_text_from_file(const std::string& path)
 {
 	std::ifstream in(path, std::ios::binary);
 
-	std::ostringstream ss;
-	ss << in.rdbuf();
-	return ss.str();
+	in.seekg(0, std::ios::end);
+	std::streamoff size = in.tellg();
+	in.seekg(0, std::ios::beg);
+
+	std::string text(static_cast<size_t>(size), '\0');
+	in.read(text.data(), size);
+
+	return text;
 }
 
 std::vector<std::string> tokenize_words(const std::string& text)
@@ -138,6 +143,7 @@ int main(int argc, char** argv)
 	int ret = 0;
 
 	std::string text = read_text_from_file(argv[1]);
+	std::cout << "Loaded bytes: " << text.size() << "\n";
 
 	// 1) Build corpus tokens
 	// arrays of words, like:
